@@ -1,10 +1,10 @@
 /******************************************************************************
-HackaDay Super Conference Blink_Hackaday
+HackaDay Super Conference Phant_Get
 Toni Klopfenstein @ SparkFun Electronics
 OCtober 2015
-<github repository address>
+www.github.com/sparkfun/crowdsourcing_control_esp8266_thing
 
-Intro sketch to test basic features of the ESP8266 Thing.
+Sketch to host a basic site on the ESP8266 Thing.
 
 Resources:
 ESP8266 Arduino Add-On Required
@@ -12,7 +12,7 @@ ESP8266 Arduino Add-On Required
 Development environment specifics:
 Arduino 1.6.5+ with the ESP8266 Thing()
 
-Based on AP Web Server example by Jim Lindblom, SparkFun Electronics 2015
+Based on AP_WebServer example by Jim Lindblom, SparkFun Electronics 2015
 
 This code is released under the [MIT License](http://opensource.org/licenses/MIT).
 Please review the LICENSE.md file included with this example. If you have any questions 
@@ -20,24 +20,53 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 
 Distributed as-is; no warranty is given.
 ******************************************************************************/
-
 #include <ESP8266WiFi.h>
 
 //////////////////////
 // WiFi Definitions //
 //////////////////////
-const char WiFiAPPSK[] = "sparkfun";
+//Choose a password for your access point
+const char WiFiAPPSK[] = "superconference15";
 
 /////////////////////
 // Pin Definitions //
 /////////////////////
-
-const int ESP8266_Analog = A0;
-const int ESP8266_LED = 4;
-
+const int ESP8266_LED = 4; // External LED
+const int ESP8266_Analog = A0; // The only analog pin on the Thing
 
 WiFiServer server(80);
 
+//Hardware Intializiation function
+void initHardware()
+{
+  pinMode(ESP8266_LED, OUTPUT);
+  digitalWrite(ESP8266_LED, LOW);
+
+}
+
+//Create WiFi network with a unique ssid
+void setupWiFi()
+{
+  WiFi.mode(WIFI_AP);
+
+  uint8_t mac[WL_MAC_ADDR_LENGTH];
+  WiFi.softAPmacAddress(mac);
+  String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) +
+                 String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
+  macID.toUpperCase();
+  //Add your name here to differentiate WiFi networks
+  String AP_NameString = "<YOUR NAME> " + macID;
+
+  char AP_NameChar[AP_NameString.length() + 1];
+  memset(AP_NameChar, 0, AP_NameString.length() + 1);
+
+  for (int i=0; i<AP_NameString.length(); i++)
+    AP_NameChar[i] = AP_NameString.charAt(i);
+
+  WiFi.softAP(AP_NameChar, WiFiAPPSK);
+}
+
+//Set up loop
 void setup() 
 {
   initHardware();
@@ -82,7 +111,7 @@ void loop()
   // If we're setting the LED, print out a message saying we did
   if (val >= 0)
   {
-    s += "LED is now ";
+    s += "LED is ";
     s += (val)?"on":"off";
   }
   else if (val == -2)
@@ -99,39 +128,7 @@ void loop()
   // Send the response to the client
   client.print(s);
   delay(1);
-  Serial.println("Client disonnected");
-
   // The client will actually be disconnected 
   // when the function returns and 'client' object is detroyed
 }
-
-void setupWiFi()
-{
-  WiFi.mode(WIFI_AP);
-
-  // Do a little work to get a unique-ish name. Append the
-  // last two bytes of the MAC (HEX'd) to "Thing-":
-  uint8_t mac[WL_MAC_ADDR_LENGTH];
-  WiFi.softAPmacAddress(mac);
-  String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) +
-                 String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
-  macID.toUpperCase();
-  String AP_NameString = "ESP8266 Thing " + macID;
-
-  char AP_NameChar[AP_NameString.length() + 1];
-  memset(AP_NameChar, 0, AP_NameString.length() + 1);
-
-  for (int i=0; i<AP_NameString.length(); i++)
-    AP_NameChar[i] = AP_NameString.charAt(i);
-
-  WiFi.softAP(AP_NameChar, WiFiAPPSK);
-}
-
-void initHardware()
-{
-  Serial.begin(115200);
-  pinMode(ESP8266_LED, OUTPUT);
-  digitalWrite(ESP8266_LED, LOW);
-}
-
 

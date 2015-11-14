@@ -2,7 +2,7 @@
 HackaDay Super Conference Blynk_Demo
 Toni Klopfenstein @ SparkFun Electronics
 OCtober 2015
-<github repository address>
+www.github.com/sparkfun/crowdsourcing_control_esp8266_thing
 
 Sketch to demo the ESP8266 Thing in the Blynk app.
 
@@ -35,18 +35,20 @@ Distributed as-is; no warranty is given.
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
-// You should get Auth Token in the Blynk App. Go to the Project Settings (nut icon).
+
+//Add authentication token created in Blynk app
 char auth[] = "64a41877dee64ba497d4ba701cd4fd5a";
 
+//Start Blynk library, connect to local WiFi network
+//Your Thing does not need to be on the same network
+//as the smart device that has the Blynk app running. 
 void setup() 
 {
   
-  Blynk.begin(auth, "3815", "Jkdk1985");
-  
+  Blynk.begin(auth, "SSID", "Password");
 }
 
-
-
+//Control the Thing via the app
 void loop() 
 {
   Blynk.run();
